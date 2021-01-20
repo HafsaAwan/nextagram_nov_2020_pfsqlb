@@ -19,7 +19,11 @@
   </div>
   <div class="container">
     {% for image in user.images %}
-    <img src="{{image.full_image_path}}" width="350"/>
+    <div>
+      <img src="{{image.full_image_path}}" width="350"/>
+      <p>Donations received: ${{ image.donations | sum(attribute="amount") }}</p>
+      <a class="btn btn-primary" href="{{url_for('donations.new', image_id=image.id)}}">Donate</a>
+    </div>
     {% endfor %}
   </div>
  
