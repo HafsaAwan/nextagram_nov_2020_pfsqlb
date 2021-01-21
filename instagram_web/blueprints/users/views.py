@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import peewee as pw
 from models.user import User
-from flask_login import login_required, login_user, current_user
+from models.image import Image
+from models.donation import Donation
 from werkzeug import secure_filename
 from instagram_web.util.helpers import upload_file_to_s3
+from flask_login import login_required, login_user, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -30,8 +33,9 @@ def create():
 @users_blueprint.route('/<username>', methods=["GET"])
 @login_required
 def show(username):
-    user = User.get_or_none(User.username == username)
+    user = User.select().where(User.username == username).limit(1)
     if user:
+        user = pw.prefetch(user, Image, Donation)[0]
         return render_template("users/show.html", user=user)
     else:
         flash("No user found")

@@ -1,10 +1,21 @@
-import boto3, botocore
+import os
+import braintree
 from app import app
+import boto3, botocore
 
 s3 = boto3.client(
    "s3",
    aws_access_key_id=app.config["S3_KEY"],
    aws_secret_access_key=app.config["S3_SECRET"]
+)
+
+gateway = braintree.BraintreeGateway(
+    braintree.Configuration(
+        braintree.Environment.Sandbox,
+        merchant_id=os.environ["BT_MERCHANT"],
+        public_key=os.environ["BT_KEY"],
+        private_key=os.environ["BT_SECRET"]
+    )
 )
 
 def upload_file_to_s3(file, username, acl="public-read"):
